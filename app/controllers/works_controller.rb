@@ -81,6 +81,8 @@ class WorksController < ApplicationController
     else
       flash[:result_text] = "You must log in to do that"
       status = :unauthorized
+      redirect_to works_path
+      return
     end
 
     # Refresh the page to show either the updated vote count
