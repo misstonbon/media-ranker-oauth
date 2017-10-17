@@ -43,24 +43,29 @@ class WorksController < ApplicationController
   end
 
   def update
-    @work.update_attributes(media_params)
-    if @work.save
-      flash[:status] = :success
-      flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
-      redirect_to work_path(@work)
-    else
-      flash.now[:status] = :failure
-      flash.now[:result_text] = "Could not update #{@media_category.singularize}"
-      flash.now[:messages] = @work.errors.messages
-      render :edit, status: :not_found
+    if !@login_user
+
+      @work.update_attributes(media_params)
+      if @work.save
+        flash[:status] = :success
+        flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
+        redirect_to work_path(@work)
+      else
+        flash.now[:status] = :failure
+        flash.now[:result_text] = "Could not update #{@media_category.singularize}"
+        flash.now[:messages] = @work.errors.messages
+        render :edit, status: :not_found
+      end
     end
   end
 
   def destroy
-    @work.destroy
-    flash[:status] = :success
-    flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
-    redirect_to root_path
+    unless !@login_user
+      @work.destroy
+      flash[:status] = :success
+      flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
+      redirect_to root_path
+    end
   end
 
   def upvote
@@ -79,6 +84,8 @@ class WorksController < ApplicationController
         flash[:result_text] = "Could not upvote"
         flash[:messages] = vote.errors.messages
         status = :conflict
+        redirect_to works_path
+        return
       end
     else
       flash[:result_text] = "You must log in to do that"
@@ -92,7 +99,7 @@ class WorksController < ApplicationController
     redirect_back fallback_location: work_path(@work), status: status
   end
 
-private
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end

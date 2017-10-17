@@ -19,10 +19,12 @@
 
     <nav class="columns small-12">
       <%= link_to "View top media", root_path, class: "button" %>
+      <%if @login_user%>
       <%= link_to "View all media", works_path, class: "button" %>
       <%= link_to "Add a new work", new_work_path, class: "button" %>
       <%= link_to "View all users", users_path, class: "button" %>
       <div class="float-right">
+        <% end %>
         <% if @login_user %>
           <%= link_to "Logged in as #{@login_user.username}", user_path(@login_user), class: "button" %>
           <%= link_to "Log Out", logout_path, method: :post, class: "button" %>
